@@ -24,13 +24,13 @@ namespace NoTypeSay;
 // ReSharper disable once UnusedType.Global
 public sealed unsafe partial class Plugin : IDalamudPlugin
 {
+    // This is the IconId used for the button
+    private readonly Lazy<uint> converseIconId = new(() => GetEmoteFromSlashCommand("/converse").Icon);
+
     // This is the ID for eat chicken plus the flag they use to indicate an emote ID
     // We use this as a sentinel for identifying a button we injected, since we don't
     // expect them to ever require a /eatchicken
-    private const int EmoteActionId = 0x2000000 | 271;
-
-    // This is the icon ID for the button
-    private const int ConverseIconId = 64345;
+    private readonly Lazy<uint> emoteActionId = new(() => GetEmoteFromSlashCommand("/eatchicken").RowId | 0x2000000);
 
     private readonly List<Entry> questEntries = [];
 
@@ -47,6 +47,10 @@ public sealed unsafe partial class Plugin : IDalamudPlugin
             Framework.Run(ForceRedraw);
         }
     }
+
+    private int ConverseIconId => (int)converseIconId.Value;
+
+    public int EmoteActionId => (int)emoteActionId.Value;
 
     [PluginService]
     internal static IDataManager DataManager { get; private set; } = null!;
@@ -85,6 +89,12 @@ public sealed unsafe partial class Plugin : IDalamudPlugin
             foreach (var e in questEntries) e.ResetTodoEntry(numberArray, sad, ref offset);
             ForceRedraw();
         });
+    }
+
+    private static Emote GetEmoteFromSlashCommand(string command)
+    {
+        var id = DataManager.Excel.GetSheet<TextCommand>().First(r => r.Command == command).RowId;
+        return DataManager.Excel.GetSheet<Emote>().First(r => r.TextCommand.RowId == id);
     }
 
     private static void ForceRedraw()
@@ -126,7 +136,7 @@ public sealed unsafe partial class Plugin : IDalamudPlugin
                 Index = i,
                 TitleText = Utf8String.FromSequence((byte*)stringArray->QuestTexts[i]),
                 DetailText = Utf8String.FromSequence((byte*)stringArray->QuestTexts[entryCount + i]),
-                ButtonCount = numArray->ButtonCountForQuest[i]
+                ButtonCount = numArray->ButtonCountForQuest[i],
             };
 
             // Populate the existing data into our record
@@ -282,7 +292,7 @@ public sealed unsafe partial class Plugin : IDalamudPlugin
             ClientLanguage.French => EnFrRegex(),
             ClientLanguage.Japanese => JpRegex(),
             ClientLanguage.German => DeRegex(),
-            _ => EnFrRegex() // This shouldn't really happen, but in the worst case, just try this
+            _ => EnFrRegex(), // This shouldn't really happen, but in the worst case, just try this
         };
         var message = qd.Value.ToString();
         return re.Matches(todoText).Any(m => m.Captures[0].Value.Contains(message));
