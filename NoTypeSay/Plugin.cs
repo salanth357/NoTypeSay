@@ -347,7 +347,7 @@ public sealed unsafe partial class Plugin : IDalamudPlugin
             var sb = new StringBuilder();
             sb.Append($"{Index}: [{(Modified ? 'x' : ' ')}] {ButtonCount} {TitleText->ToString()}");
             return sb.ToString();
-        }
+        } // 0x100b492 - b492 is itemID
 
         internal void ResetTodoEntry(ToDoListNumberArray* nad, StringArrayData* sad, ref int offset)
         {

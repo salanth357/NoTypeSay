@@ -4,6 +4,7 @@
     "Punchline": "Tired of typing snae ling? Click instead!",
     "Description": "Adds a button on the duty list for /say quests like quest items and emotes have!\n Compatible with all languages and controllers.",
     "ApplicableVersion": "any",
+    "FeedbackMessage": "Please include your game language if you're having any issues",
     "Tags": [
         "quest",
         "say"
