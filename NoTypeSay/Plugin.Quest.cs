@@ -31,6 +31,7 @@ public partial class Plugin
             ClientLanguage.French => EnFrRegex(),
             ClientLanguage.Japanese => JpRegex(),
             ClientLanguage.German => DeRegex(),
+            ClientLanguage.Korean => KrRegex(),
             _ => EnFrRegex(), // This shouldn't really happen, but in the worst case, just try this
         };
         var message = qd.Value.ToString();
@@ -45,6 +46,9 @@ public partial class Plugin
 
     [GeneratedRegex("„([^“]+)“")]
     private static partial Regex DeRegex();
+
+    [GeneratedRegex("\"([^\"]+)\"")]
+    private static partial Regex KrRegex();
 
     [GeneratedRegex("_(SAY|SAYTODO|SYSTEM)_")]
     private static partial Regex KeyRegex();
